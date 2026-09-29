@@ -17,7 +17,10 @@
 | 4 | 死代码清理：`PostFX.js:649,686` 的 `_timers` 残段；`PostFX.js:126,132` 重复赋值；`'TAAU '` 标签尾随空格（PostFX.js:710） | 见左 | 全库 grep 无 `_timers`；profiler 输出标签正确 |
 | 5 | `Frame.setFrameCamera` 每帧 clone ~10 个矩阵/向量（engine/render/Frame.js:120-141） | 见左 | 帧循环该路径零分配（用分配 profiling 验证）；27 fps → 无回归 |
 
-## P1 工程化（1 周）
+## P1 工程化（✅ 完成 2026-09-30，实测修订见下）
+
+> 执行记录：#7 draw buffer 满改为丢弃尾部 + `stats.dropped` 计数（每容量档警告一次）；#8 `Texture.view` 单条目描述符备忘（命中时零字符串分配，`_views.clear()` 处同步失效）；#9 水材质 13 路调试视图按 `?wdbg` 构造期编译（生产 shader 无调试分支，运行时切换不再支持）；#10 GTAO sin-hash 换共享 PCG hash；#11 nightly-render.yml（game-logic + engine-smoke 为门禁，视觉 harness 出 PNG artifact）；#12 弃用的 GitHub Pages workflow 已删（Vercel Git 集成需在控制台关联仓库）；#13 对象扩展字段契约表写入 AGENTS.md。
+> **#6 修订（实测否决）**：读 SceneRenderer 后发现 6 次 collect 的 layerMask/相机各不相同，"collect 只做一次"的缓存前提不成立；实测 `scene.updateMatrixWorld()` 每帧 6 次共 ~0.09-0.16ms（ocean 场景 + 300 动态对象），低于值得冒险的阈值——帧中修改矩阵的语义风险大于收益，不做。
 
 | # | 任务 | 证据/动机 | 验收 |
 |---|---|---|---|

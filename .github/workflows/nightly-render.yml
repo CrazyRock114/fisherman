@@ -1,0 +1,60 @@
+# Nightly render tests: the headless harnesses run the real GPU (Dawn) and save reference PNGs.
+# game-logic + engine-smoke gate the run; the visual harnesses are best-effort (CI software
+# rendering differs from real GPUs) and upload their images for comparison.
+# Locally: the same harnesses run on your GPU — compare against the uploaded artifacts.
+
+name: Nightly render tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 2 * * *' # 02:17 UTC daily
+
+concurrency:
+  group: nightly-render
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install (includes the Dawn WebGPU binary)
+        run: npm ci
+
+      - name: Gate: game logic + engine smoke
+        run: |
+          node test/game-logic.mjs
+          node test/engine-smoke.mjs
+
+      - name: Ocean harnesses
+        run: |
+          mkdir -p shots
+          node test/ocean-surface.mjs shots
+          node test/ocean-spray.mjs shots/spray
+          node test/ocean-full.mjs shots
+
+      - name: Sky + post harnesses
+        run: |
+          node test/sky-env.mjs shots 960 480
+          node test/sky-textures.mjs shots
+          REAL_SKY=16 node test/post-chain.mjs shots 960 480
+        continue-on-error: true # software rendering may flake; the PNGs are what matters
+
+      - name: Headless render flags (NaN checks)
+        run: node test/sky-env.mjs shots-nan 640 320
+        env:
+          NANCHECK: '1'
+        continue-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: render-shots
+          path: shots*/
+          retention-days: 14

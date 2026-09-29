@@ -49,9 +49,21 @@ git push
 1. 每个魔法数字旁边写出处（论文/实测），格式如 `// 8x costs +0.5ms @1440p; 4x is enough`。
 2. 每个 fallback/防御分支注明它防的伪影或失败案例。
 3. 玩法逻辑不 import 渲染对象；HUD 缺失时优雅降级（headless 模式参考 `src/game/Game.js:146`）。
-4. 跨系统共享的 WGSL 函数走 ShaderModule 单点定义（前缀表见 PORTING.md），禁止复制粘贴两份各自维护。
+4. 跨系统共享的 WGSL 函数走 ShaderModule 单点定义（前缀表见 PORTING.md），禁止复制粘贴两份。
 5. 改时序/滤波算法前先跑基线：`?bench&shots=<view>` 出参考图对比，测试基建见 `test/taa-pier.mjs`。
 6. 随机性一律用可注入 rng（`Bites.js` 风格），保证测试确定性。
+
+## 对象扩展字段契约（跨文件的隐式协议，改动前先查这张表）
+
+引擎在 Object3D/Mesh 实例上挂的私有字段——所有读写方都列在这里，新增读写方必须更新本表：
+
+| 字段 | 写入方 | 读取方 | 语义 |
+|---|---|---|---|
+| `obj.__draw` | `MeshRenderer._slot` | 仅 MeshRenderer | 每对象 draw 槽位缓存 `{ frame, slot, cur, prev, has }`；slot = -1 表示该帧因 draw buffer 满被丢弃 |
+| `obj.staticVelocity` | `CameraVelocity.useStaticVelocity(root)`、各静态系统（Terrain/Rocks/Debris/Breakers mesh 等） | `MeshRenderer._slot`、`WaterMaterial`、`CameraVelocity` | true = 该对象不在世界移动（只相机动）：运动向量用上一帧相机重投影，跳过 prev 矩阵跟踪 |
+| `obj.resetVelocity` | 任何传送/瞬移对象的系统（置 true）；`MeshRenderer._slot` 消费后置 false | 仅 MeshRenderer | true = 下一帧运动向量置零（prev = 当前），防止传送拖影 |
+| `obj.drawParams` | 各系统（每对象材质参数） | `MeshRenderer._slot` | 写进 draw uniform 的逐对象参数（id + 最多 7 float） |
+| `frame.prevViewProjNoJitter` 等 Frame 字段 | `setFrameCamera` / `PostFX.beginFrame` | WGSL 全体 + CPU 侧（**读取后必须立即 copy**，字段对象跨帧复用） | 见 `engine/render/Frame.js` 的 `_scratch` 注释 |
 
 ## 迭代方向
 

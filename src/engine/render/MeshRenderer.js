@@ -84,6 +84,7 @@ export class MeshRenderer {
 
 		} );
 		this.stats.draws = 0;
+		this.stats.dropped = 0;
 		this.stats.triangles = 0;
 
 	}
@@ -94,7 +95,24 @@ export class MeshRenderer {
 		let g = obj.__draw;
 		if ( ! g ) g = obj.__draw = { frame: - 1, slot: 0, cur: new Float32Array( 16 ), prev: new Float32Array( 16 ), has: false };
 		if ( g.frame === GPU.frame ) return g.slot;
-		if ( this.drawCount >= this.capacity ) throw new Error( 'MeshRenderer: draw buffer full' );
+		if ( this.drawCount >= this.capacity ) {
+
+			// over capacity: the buffer doubles for the next frame (_beginFrame), so drop the tail of
+			// this frame's draw lists instead of throwing (the lists are sorted, so the tail is the
+			// farthest opaque / the nearest transparent)
+			if ( this._warnedAt !== this.capacity ) {
+
+				console.warn( `MeshRenderer: draw buffer full (${ this.capacity } draws), dropping the tail of the draw lists for this frame` );
+				this._warnedAt = this.capacity;
+
+			}
+
+			g.frame = GPU.frame;
+			g.slot = - 1;
+			return g.slot;
+
+		}
+
 		g.frame = GPU.frame;
 		g.slot = this.drawCount ++;
 		const e = obj.matrixWorld.elements;
@@ -562,7 +580,9 @@ export class MeshRenderer {
 
 			}
 
-			rp.setBindGroup( 2, this.drawBindGroup, [ this._slot( o ) * DRAW_STRIDE ] );
+			const slot = this._slot( o );
+			if ( slot < 0 ) { this.stats.dropped ++; continue; }
+			rp.setBindGroup( 2, this.drawBindGroup, [ slot * DRAW_STRIDE ] );
 			for ( let i = 0; i < vl.buffers.length; i ++ ) rp.setVertexBuffer( i, this._attributeBuffer( geo, vl.buffers[ i ].attr ) );
 			const instances = o.isInstancedMesh ? o.count : geo.instanceCount ?? 1;
 			if ( instances === 0 ) continue;

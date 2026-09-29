@@ -53,7 +53,7 @@ export const viewPositionFromViewZ = ( uv, viewZ ) => `viewPositionFromViewZ( ${
 // shader: previous world position = current, staticVelocity), r.mask = ( seenFromBelow, 1, 0, 1 ).
 export class WaterMaterial extends Material {
 
-	constructor( { surface, sky, sceneCopy, sceneDepthHalf = null, refraction = null, reflection = null, hullMask = null, hullMaskActive = null } ) {
+	constructor( { surface, sky, sceneCopy, sceneDepthHalf = null, refraction = null, reflection = null, hullMask = null, hullMaskActive = null, debugViews = false } ) {
 
 		super( {
 			name: 'water',
@@ -104,6 +104,9 @@ export class WaterMaterial extends Material {
 			ssr: U.ssr,
 		};
 		this.debugMode = U.debugMode;
+		// the 13 debug views are compiled into the shader only when asked for at construction
+		// (App passes ?wdbg): shipping shaders skip the whole branch chain
+		this.debugViews = debugViews;
 
 		// opaque scene color/depth copies (made by SceneRenderer right before the water pass)
 		this.sceneDepthTexture = sceneCopy.depthTexture;
@@ -587,6 +590,7 @@ ${ SF ? '		let foamLit = surfFoamLight( surf.foamInfo, N, L, V, sunLight, pos );
 
 	}
 
+${ this.debugViews ? `
 	// debug views: 1 = back faces red, 2 = normals, 3 = foam, 7 = the seabed seen through, 12 = its source
 	let dbg = mat.debugMode;
 	var res = min( outCol, vec3f( 16000.0 ) );
@@ -624,6 +628,9 @@ ${ SF ? '		let foamLit = surfFoamLight( surf.foamInfo, N, L, V, sunLight, pos );
 	} else if ( dbg == 5 ) {
 		res = vec3f( fract( lagXZ.x * 0.1 ), fract( vHeight ), fract( lagXZ.y * 0.1 ) );
 	}
+` : `
+	var res = min( outCol, vec3f( 16000.0 ) );
+`}
 	r.color = vec4f( res, 1.0 );
 	// camera velocity for TAA (default: static), plus the water mask (SceneRenderer) for the
 	// underwater pass: whether the visible surface is seen from below

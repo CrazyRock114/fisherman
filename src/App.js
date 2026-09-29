@@ -244,6 +244,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.waterMaterial = new WaterMaterial( {
 			surface: this.surface, sky: this.sky, sceneCopy: this.sceneRenderer.opaqueCopy, sceneDepthHalf: this.sceneRenderer.opaqueDepthHalf.texture, refraction: this.refraction,
 			hullMask: this.sceneRenderer.hullMaskRT.texture, hullMaskActive: this.sceneRenderer.hullMaskActive,
+			debugViews: qs.has( 'wdbg' ),
 		} );
 		this.waterMaterial.clouds = this.clouds;
 		this.ocean = new Mesh( this.oceanLOD.geometry, this.waterMaterial );

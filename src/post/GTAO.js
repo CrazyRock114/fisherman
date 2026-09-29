@@ -136,10 +136,9 @@ fn gtaoNormalFromDepth( uv: vec2f ) -> vec3f {
 	let dpdy = select( - ce + gtaoViewPosition( uv - vec2f( 0.0, 1.0 / size.y ), t1 ), ce - gtaoViewPosition( uv + vec2f( 0.0, 1.0 / size.y ), b1 ), db < dt );
 	return normalize( cross( dpdx, dpdy ) );
 }
+// the classic sin-hash this used to hand-roll is lower quality than the shared PCG hash
 fn gtaoRand( uv: vec2f ) -> f32 {
-	let dt = dot( uv, vec2f( 12.9898, 78.233 ) );
-	let sn = dt - PI * floor( dt / PI );
-	return fract( sin( sn ) * 43758.5453 );
+	return hash21( uv );
 }
 
 fn fragment( in: FSIn ) -> vec4f {

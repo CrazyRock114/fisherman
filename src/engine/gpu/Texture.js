@@ -11,6 +11,18 @@ import { GPU, formatInfo, sampleTypeOf } from './GPU.js';
 
 let _texId = 0;
 
+// the GPUTextureViewDescriptor fields (a descriptor carrying anything else falls back to the key string)
+const _VIEW_FIELDS = [ 'dimension', 'baseMipLevel', 'mipLevelCount', 'baseArrayLayer', 'arrayLayerCount', 'aspect' ];
+
+function _sameViewDesc( a, b ) {
+
+	for ( const k of _VIEW_FIELDS ) if ( ( a[ k ] ?? undefined ) !== ( b[ k ] ?? undefined ) ) return false;
+	for ( const k in a ) if ( ! _VIEW_FIELDS.includes( k ) && a[ k ] !== b[ k ] ) return false;
+	for ( const k in b ) if ( ! _VIEW_FIELDS.includes( k ) && a[ k ] !== b[ k ] ) return false;
+	return true;
+
+}
+
 export class Texture {
 
 	constructor( o = {} ) {
@@ -30,6 +42,7 @@ export class Texture {
 		this.gpu = null;
 		this.version = 0;
 		this._views = new Map();
+		this._lastView = null;
 		this.isTexture = true;
 		if ( o.data ) this.pendingData = o.data;
 
@@ -107,6 +120,7 @@ export class Texture {
 			usage: this.usage,
 		} );
 		this._views.clear();
+		this._lastView = null;
 		this.version ++;
 		if ( this.pendingData ) {
 
@@ -122,6 +136,10 @@ export class Texture {
 	view( o = null ) {
 
 		const g = this.getGPU();
+		// hot path (every render pass, every frame): most calls repeat the previous descriptor, so
+		// compare the fields directly and never build the JSON key string
+		const last = this._lastView;
+		if ( last && ( last.o === o || ( last.o !== null && o !== null && _sameViewDesc( last.o, o ) ) ) ) return last.view;
 		const key = o ? JSON.stringify( o ) : '';
 		let v = this._views.get( key );
 		if ( ! v ) {
@@ -131,6 +149,7 @@ export class Texture {
 
 		}
 
+		this._lastView = { o, view: v };
 		return v;
 
 	}
