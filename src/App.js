@@ -370,10 +370,13 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.gpu = GPU; // console / test access
 
 		// ---- compile pipelines asynchronously (keeps the page responsive), then prime a few
-		// frames behind the loading screen so any remaining first-use stalls happen there
+		// frames behind the loading screen so any remaining first-use stalls happen there.
+		// Two phases: the loading screen only waits for the pipelines the spawn view uses (a
+		// single warm frame requests them), which lets the game start much earlier; the full
+		// every-mesh precompile then runs behind the start overlay (start()).
 		// stage weights: in the browser the pipeline compile below takes far longer than everything before it
 		await progress( 0.36, 'Compiling shaders…', 0.95 );
-		await this.precompile();
+		await this.precompile( false );
 		await progress( 0.96, 'Warming up…' );
 		for ( let i = 0; i < 2; i ++ ) {
 
@@ -388,7 +391,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 	// screen). The precompile frame visits every mesh of every pass, hidden or out of view, and the
 	// pipelines compile in parallel in the background (GPU.renderPipeline); the refraction pass and
 	// the hull mask are forced on so their variants are built too.
-	async precompile() {
+	async precompile( full = true ) {
 
 		const mr = this.engine.meshRenderer;
 		const refr = this.refraction.enabled;
@@ -402,6 +405,17 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 
 		}
 
+		if ( ! full ) {
+
+			// first phase (loading screen): one warm frame in the spawn view requests every pipeline
+			// it uses; everything off-screen pops in later or is covered by the second phase
+			this.frame( 1 / 60 );
+			await GPU.pipelinesReady();
+			return;
+
+		}
+
+		this._fullPrecompiled = true;
 		await GPU.pipelinesReady();
 		mr.precompiling = true;
 		this.refraction.enabled = true;
@@ -555,6 +569,13 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 	start() {
 
 		this.engine.start( ( dt, t ) => this.frame( dt, t ) );
+		// second phase: the full every-mesh precompile runs behind the start overlay, so the first
+		// minutes of play never hitch on a first-use pipeline either
+		if ( ! this._fullPrecompiled ) setTimeout( () => {
+
+			this.precompile( true ).catch( ( e ) => console.warn( 'precompile failed', e ) );
+
+		}, 250 );
 
 	}
 

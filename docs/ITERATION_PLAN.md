@@ -33,7 +33,11 @@
 | 12 | Vercel Git 集成：控制台关联 CrazyRock114/fisherman，push 即部署；`.github/workflows/deploy.yml` 彻底移除 | 当前 CLI 直推 | push main 后 Vercel 自动构建 |
 | 13 | Monkey patch 契约集中化：`obj.__draw`/`staticVelocity`/`resetVelocity` 等散落的私有字段集中到一个文档/常量表 | CameraVelocity.js、MeshRenderer.js:94 等 | AGENTS.md 增补"对象扩展字段契约"表 |
 
-## P2 性能与体验（2 周）
+## P2 性能与体验（✅ 完成 2026-09-30，#16/#17 有决策记录）
+
+> 执行记录：#14 预编译分两相——加载屏只等出生视野用到的管线（一个预热帧发起请求 + pipelinesReady），全量 every-mesh 预编译挪到 start() 后在开始界面期间后台跑（`precompile(false | true)`，失败有 catch 兜底，漏编译的管线由 syncPipelines=false 路径首用补编）；#15 Performance 标签新增 Quality 预设（Low/Medium/High：renderScale、AA 倍数、阴影、SSR、GTAO 采样数、云 resolutionScale），localStorage 独立持久化（`tidewater-quality`，与游戏存档分离——设置属于设备，存档可携带）；#18 存档导出/导入（GameState.exportSave/importSave + 设置面板 Save data 文件夹，剪贴板导出、粘贴导入，game-logic 新增 4 条断言含 junk 拒绝与 onChange 通知）。
+> **#16 决策记录**：远级联（400m 档）提频到每 2 帧实测 +0.4~0.7ms（约 5% 帧成本，两轮 A/B），感知收益未证实——**维持每 4 帧**；若实测可感，改 `Shadows.js` 的 `periods` 一行即可，成本已量化。
+> **#17 延后**：LocalLights 阴影近似是独立图形特性（深度图短阴影），工作量超出本轮，留待 P3 后评估。
 
 | # | 任务 | 动机 | 验收 |
 |---|---|---|---|

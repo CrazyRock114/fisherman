@@ -241,6 +241,85 @@ export class AppUI {
 		s.ssr = true;
 		quality.addToggle( { label: 'Water reflections', object: s, key: 'ssr', tooltip: 'Screen-space reflections of the pier, boats and hills on the water.', onChange: ( v ) => { app.waterMaterial.params.ssr.value = v ? 1 : 0; } } );
 
+		// quality presets: the knobs that actually move the frame cost, persisted separately from the
+		// game save (settings are per device, the save is portable)
+		const QUALITY = {
+			low: { renderScale: 0.6, aa: 0, shadows: false, ssr: false, aoSamples: 8, cloudScale: 0.5 },
+			medium: { renderScale: 0.8, aa: 4, shadows: true, ssr: true, aoSamples: 12, cloudScale: 0.75 },
+			high: { renderScale: 1, aa: 8, shadows: true, ssr: true, aoSamples: 12, cloudScale: 1 },
+		};
+		const applyQuality = ( k ) => {
+
+			const q = QUALITY[ k ];
+			if ( ! q ) return;
+			s.quality = k;
+			s.renderScale = q.renderScale;
+			app.setRenderScale( q.renderScale );
+			s.aa = q.aa;
+			app.post.aaMode = q.aa > 0 ? 'taa' : 'none';
+			if ( q.aa > 0 ) app.post.taau.jitterPhaseOverride = q.aa;
+			s.shadows = q.shadows;
+			app.shadows.enabled = q.shadows;
+			s.ssr = q.ssr;
+			app.waterMaterial.params.ssr.value = q.ssr ? 1 : 0;
+			if ( app.post.aoPass ) app.post.aoPass.samples.value = q.aoSamples; // GTAO rebuilds on change
+			if ( app.clouds ) app.clouds.resolutionScale = q.cloudScale;
+			ui.refresh();
+
+		};
+
+		let savedQuality = null;
+		try {
+
+			savedQuality = localStorage.getItem( 'tidewater-quality' );
+
+		} catch ( e ) { /* blocked storage: defaults are fine */ }
+
+		if ( savedQuality && QUALITY[ savedQuality ] ) applyQuality( savedQuality );
+		s.quality = savedQuality && QUALITY[ savedQuality ] ? savedQuality : 'high';
+		quality.addSelect( { label: 'Preset', object: s, key: 'quality', options: { Low: 'low', Medium: 'medium', High: 'high' }, onChange: ( v ) => {
+
+			applyQuality( v );
+			try {
+
+				localStorage.setItem( 'tidewater-quality', v );
+
+			} catch ( e ) { /* blocked storage: applies for this session only */ }
+
+			ui.toast( `Quality: ${ v }` );
+
+		} } );
+
+		// save data: the cooler lives in this browser; export / import moves it between devices
+		const state = app.game && app.game.state;
+		if ( state ) {
+
+			const data = perf.addFolder( 'Save data', { icon: 'info', open: false } );
+			data.addButton( { label: 'Export save (copy to clipboard)', icon: 'check', onClick: async () => {
+
+				const json = state.exportSave();
+				try {
+
+					await navigator.clipboard.writeText( json );
+					ui.toast( 'Save copied to the clipboard' );
+
+				} catch ( e ) {
+
+					window.prompt( 'Copy your save (select all, then copy):', json );
+
+				}
+
+			} } );
+			data.addButton( { label: 'Import save (paste a save)', icon: 'reset', onClick: async () => {
+
+				const json = window.prompt( 'Paste the save to import:' );
+				if ( ! json ) return;
+				ui.toast( state.importSave( json ) ? 'Save imported' : 'That does not look like a Tidewater save' );
+
+			} } );
+
+		}
+
 		this._t = 0;
 
 	}

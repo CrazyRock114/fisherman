@@ -235,6 +235,33 @@ export class GameState {
 
 	}
 
+	// a portable copy of the save (clipboard here, pasted back on another device)
+	exportSave() {
+
+		return JSON.stringify( this.toJSON() );
+
+	}
+
+	importSave( json ) {
+
+		let d;
+		try {
+
+			d = JSON.parse( json );
+
+		} catch ( e ) {
+
+			return false;
+
+		}
+
+		if ( ! this.fromJSON( d ) ) return false;
+		this.save();
+		this.emit();
+		return true;
+
+	}
+
 	reset() {
 
 		this.money = 0;

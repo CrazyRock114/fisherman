@@ -121,6 +121,17 @@ const s2 = new GameState( storage );
 s.save();
 ok( s2.load() && s2.money === s.money && s2.inventory.length === 1 && s2.log.grunt.bestKg === 0.84 && s2.stats.holdKg === 70, 'save / load round trip' );
 ok( s2.addFish( 'grunt', 0.5 ).id > b.id, 'ids keep counting after a load' );
+// ---- portable save: export / import between devices
+{
+	const s3 = new GameState( null );
+	ok( s3.importSave( s.exportSave() ) && s3.money === s.money && s3.inventory.length === 1 && s3.upgrades.hold === 1 && s3.log.grunt.bestKg === 0.84, 'export / import round trip' );
+	ok( s3.importSave( 'not json' ) === false && s3.importSave( '{"v":9}' ) === false, 'import rejects junk' );
+	let emitted = 0;
+	s3.onChange( () => emitted ++ );
+	s3.importSave( s.exportSave() );
+	ok( emitted === 1, 'import notifies the listeners (gear reapplies)' );
+
+}
 // ---- lengths and the catch card's record logic
 {
 
