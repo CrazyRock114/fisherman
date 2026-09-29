@@ -5,6 +5,7 @@ import { commonModule } from '../../engine/render/wgsl/common.js';
 import { lodFadeModule } from '../../materials/LODFade.js';
 import { SPECIES, SKIN, PATTERN } from './FishSpecies.js';
 import { PART } from './FishGeometry.js';
+import { f } from '../../util/wgsl.js';
 
 // The fish material (WGSL, ported from TSL), shared by the swimming fish (FishSchools) and the
 // fish on the market stall, drying racks and cleaning tables (FishProps).
@@ -72,12 +73,7 @@ let _table = null;
 export const skinTable = () => _table || ( _table = buildTable() );
 
 // float literal of a table constant
-const f = ( x ) => {
 
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 const PT = ( name ) => f( PATTERN[ name ] );
 const PA = ( name ) => f( PART[ name ] );
 

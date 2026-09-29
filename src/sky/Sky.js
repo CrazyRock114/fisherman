@@ -4,6 +4,7 @@ import { SCENE_FORMATS, DEPTH_FORMAT } from '../engine/render/SceneRenderer.js';
 import { commonModule } from '../engine/render/wgsl/common.js';
 import { Vector3, MathUtils } from '../engine/math/index.js';
 import { SUN_ANGULAR_RADIUS } from './Atmosphere.js';
+import { f } from '../util/wgsl.js';
 
 // Sky radiance: atmosphere (sky view LUT) + sun disk, stars, moon and moonlit sky, composited with
 // the clouds.
@@ -26,13 +27,6 @@ const STAR_SIGMA = 0.1; // star PSF (cells, ~1 px)
 const MW = new Vector3( 0.3, 0.2, 1 ).normalize(); // pole of the Milky Way band
 // reflections spread point sources over rough water: only a trace of the stars survives
 const STAR_REFLECTION = 0.08;
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 export class Sky {
 

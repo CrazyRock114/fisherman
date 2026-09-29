@@ -3,7 +3,7 @@
 import { GPU, G, E, setFrameCamera, RenderTarget, tonemapPass, savePNG, setTimeOfDay, applyReadback, wait } from './sky-harness.mjs';
 import { Atmosphere, SUN_ILLUMINANCE } from '../src/sky/Atmosphere.js';
 import { Sky, sunDirectionFromTime } from '../src/sky/Sky.js';
-import { Clouds } from '../src/sky/Clouds.js';
+import { SkyProClouds } from '../src/sky/SkyProClouds.js';
 import { Environment } from '../src/sky/Environment.js';
 import { Material } from '../src/engine/render/Material.js';
 import { MeshRenderer } from '../src/engine/render/MeshRenderer.js';
@@ -18,7 +18,7 @@ const W = Number( process.argv[ 3 ] || 2560 ), H = Number( process.argv[ 4 ] || 
 const only = process.argv[ 5 ] || null;
 const atmosphere = new Atmosphere();
 const sky = new Sky( atmosphere );
-const clouds = new Clouds( null, atmosphere );
+const clouds = new SkyProClouds( null, atmosphere );
 clouds.outputSize = { x: W, y: H };
 sky.clouds = clouds;
 const scene = new E.Scene();
@@ -98,7 +98,7 @@ for ( const [ name, hours, exposure ] of [ [ 'noon', 12.5, 1 ], [ 'morning', 8.0
 	if ( process.env.NANCHECK ) {
 
 		const { readTexture } = await import( '../src/engine/gpu/Readback.js' );
-		for ( const [ n, t ] of [ [ 'view', clouds.viewTex ], [ 'trace', clouds.traceTex ], [ 'high', clouds.highTrace ], [ 'motion', clouds.motionTex ], [ 'pano', clouds.panorama ] ] ) {
+		for ( const [ n, t ] of [ [ 'view', clouds.viewTex ], [ 'source', clouds.source ], [ 'meta', clouds.sourceMeta ], [ 'pano', clouds.panorama ], [ 'shadow', clouds.shadowMap ] ] ) {
 
 			const img = await readTexture( t );
 			const h = new Uint16Array( img.data );

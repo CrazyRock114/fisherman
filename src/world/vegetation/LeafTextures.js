@@ -2,7 +2,8 @@ import { Texture } from '../../engine/gpu/Texture.js';
 import { FullscreenPass } from '../../engine/render/FullscreenPass.js';
 import { generateMipmaps } from '../../engine/gpu/Mipmaps.js';
 import { ShaderModule } from '../../engine/gpu/Shader.js';
-import { vegModule, f } from './VegNodes.js';
+import { vegModule } from './VegNodes.js';
+import { f } from '../../util/wgsl.js';
 
 // Leaf-cluster cards baked once on the GPU (instead of evaluating the leaf shapes per fragment):
 // a 2 x 2 atlas of tiles, each tile a card of many small twig-end leaf whorls (tropical almond /

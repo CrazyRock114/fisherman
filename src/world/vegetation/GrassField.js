@@ -3,7 +3,8 @@ import { Texture } from '../../engine/gpu/Texture.js';
 import { ShaderModule } from '../../engine/gpu/Shader.js';
 import { Material } from '../../engine/render/Material.js';
 import { mulberry32 } from '../../util/Noise.js';
-import { vegModule, uCamPos, C, f } from './VegNodes.js';
+import { vegModule, uCamPos, C } from './VegNodes.js';
+import { f } from '../../util/wgsl.js';
 
 // Camera-following ground flora: tall meadow grass (knee to waist high), dune grass, sea oats and
 // beach creeper.

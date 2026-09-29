@@ -2,6 +2,8 @@ import { Vector3, Sphere, Mesh, BufferGeometry, BufferAttribute } from '../engin
 import { GPU, StorageBuffer, UniformBlock, ShaderModule, ComputeKernel, Material, Readback, commonModule, LAYERS } from '../engine/webgpu.js';
 import { GRAVITY, G } from '../engine/render/Frame.js';
 import { makeLaceTexture, LACE_TILE } from './SurfFoam.js';
+import { waterFresnelModule } from './WaterMaterial.js';
+import { f } from '../util/wgsl.js';
 
 // Plunging breakers along the main beach.
 //
@@ -35,28 +37,6 @@ import { makeLaceTexture, LACE_TILE } from './SurfFoam.js';
 // sprayWrite, sprayRand), sky.module (skyReflectionRadiance), clouds.module (cloudsShadow).
 
 const NV = 20; // profile vertices across the lip (2 on the back of the crest + 18 along the curtain)
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
-
-// exact unpolarized dielectric Fresnel (the same as WaterMaterial's fresnelDielectric), cosI > 0, eta = n2/n1
-const fresnelModule = new ShaderModule( {
-	name: 'breakersFresnel',
-	code: /* wgsl */`
-fn breakersFresnel( cosI: f32, eta: f32 ) -> f32 {
-	let c = clamp( cosI, 0.0, 1.0 );
-	let g2 = eta * eta - 1.0 + c * c;
-	let g = sqrt( max( g2, 0.0 ) );
-	let a = ( g - c ) / ( g + c );
-	let b = ( c * ( g + c ) - 1.0 ) / ( c * ( g - c ) + 1.0 );
-	return select( 0.5 * a * a * ( b * b + 1.0 ), 1.0, g2 < 0.0 );
-}
-`,
-} );
 
 export class Breakers {
 
@@ -221,16 +201,15 @@ fn breakersSprayShadow( p: vec3f, seedTag: f32 ) -> f32 {
 		const spray = this.spray;
 
 		// FFT displacement at a Lagrangian point (the short cascades that survive in the surf zone),
-		// with WaterSurface.cascadeAttenuation (inlined: the long cascades vanish in shallow water)
+		// attenuated per cascade by WaterSurface's shared shallow-water module (the long cascades
+		// vanish in shallow water)
 		let fftCode = '';
 		for ( let c = 1; c < fft.cascades; c ++ ) {
 
 			const L = fft.sizes[ c ];
 			const texel = L / 256;
 			const level = Math.max( Math.log2( 0.35 / texel ) + 0.7, 0 );
-			const d0 = Math.min( 40, L * 0.08 );
-			const floorAmt = [ 0.0, 0.05, 0.25, 0.5 ][ c ] ?? 0.5;
-			fftCode += `	d += textureSampleLevel( oceanDisplacement, smpLinearRepeat, p / ${ f( L ) }, ${ c }, ${ f( level ) } ).xyz * mix( ${ f( floorAmt ) } * smoothstep( 0.0, 0.6, depth ), 1.0, smoothstep( 0.0, ${ f( d0 ) }, depth ) );\n`;
+			fftCode += `	d += textureSampleLevel( oceanDisplacement, smpLinearRepeat, p / ${ f( L ) }, ${ c }, ${ f( level ) } ).xyz * waterSurfaceCascadeAttenuation( ${ c }, depth );\n`;
 
 		}
 
@@ -328,7 +307,7 @@ fn main( @builtin( global_invocation_id ) gid: vec3u ) {
 
 		this.kernel = new ComputeKernel( {
 			label: 'Surf Crests',
-			modules: [ commonModule, this.shore.module, S.terrain && S.terrain.module, fft.module, spray && spray.module ].filter( Boolean ),
+			modules: [ commonModule, this.shore.module, S.terrain && S.terrain.module, fft.module, S.attenuationModule, spray && spray.module ].filter( Boolean ),
 			bindings: {
 				breakersP: { uniform: this.uniforms },
 				breakersStations: { storage: this.stations, access: 'read' },
@@ -615,7 +594,7 @@ fn breakersEmit( i: u32, slot: u32, root: vec3f, dir: vec2f, b: f32, H: f32, tro
 		const lace = makeLaceTexture();
 		const lipModule = new ShaderModule( {
 			name: 'breakersLip',
-			deps: [ commonModule, fresnelModule, this.sky && this.sky.module, this.clouds && this.clouds.module ],
+			deps: [ commonModule, waterFresnelModule, this.sky && this.sky.module, this.clouds && this.clouds.module ],
 			code: /* wgsl */`
 const BRK_LACE_TILE: f32 = ${ f( LACE_TILE ) };
 const BRK_NV: f32 = ${ f( NV ) };
@@ -717,7 +696,7 @@ const BRK_NV: f32 = ${ f( NV ) };
 	let grad = ( r1 * dpdx( hS ) + r2 * dpdy( hS ) ) * sign( det );
 	let N = normalize( N0 * abs( det ) - grad + N0 * 1e-9 );
 	let NdV = max( dot( N, V ), 1e-3 );
-	let F = breakersFresnel( NdV, 1.333 );
+	let F = fresnelDielectric( NdV, 1.333 );
 	let L = frame.sunDir;
 	let sun = frame.sunColor * ${ this.clouds ? 'cloudsShadow( pos.xz )' : '1.0' };
 

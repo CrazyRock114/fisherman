@@ -4,7 +4,8 @@ import { generateMipmaps } from '../../engine/gpu/Mipmaps.js';
 import { Material } from '../../engine/render/Material.js';
 import { MeshRenderer } from '../../engine/render/MeshRenderer.js';
 import { createViewUniforms, setFrameCamera } from '../../engine/render/Frame.js';
-import { vegModule, f } from './VegNodes.js';
+import { vegModule } from './VegNodes.js';
+import { f } from '../../util/wgsl.js';
 import { canopyModule } from './VegMaterials.js';
 
 // Octahedral impostors for the broadleaf trees and shrubs.

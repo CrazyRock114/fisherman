@@ -1,4 +1,5 @@
 import { Texture, ShaderModule, commonModule } from '../engine/webgpu.js';
+import { f } from '../util/wgsl.js';
 
 // Surf-zone foam: the lace texture shared by the shore simulation, and the foam look used by the
 // water shader (hooks called from WaterSurface.fragment and WaterMaterial.shade).
@@ -246,13 +247,6 @@ export class SurfFoam {
 	}
 
 	_code() {
-
-		const f = ( x ) => {
-
-			const s = String( x );
-			return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-		};
 
 		return /* wgsl */`
 struct SurfFoamArgs {

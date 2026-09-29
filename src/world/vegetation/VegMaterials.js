@@ -1,6 +1,7 @@
 import { Material } from '../../engine/render/Material.js';
 import { ShaderModule } from '../../engine/gpu/Shader.js';
-import { vegModule, vegParams, LOD_BAND, C, f } from './VegNodes.js';
+import { vegModule, vegParams, LOD_BAND, C } from './VegNodes.js';
+import { f } from '../../util/wgsl.js';
 
 // Vegetation materials (engine Materials: WGSL vertex / surface snippets on the scene lighting).
 //

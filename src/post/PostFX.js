@@ -129,7 +129,6 @@ fn fragment( in: FSIn ) -> vec4f {
 		this.aoPass.thickness.value = 2.0;
 		this.aoPass.distanceExponent.value = 1.4;
 		this.aoPass.scale.value = 1.6;
-		this.aoPass.samples.value = 12;
 		this.aoPass.useTemporalFiltering = true;
 		// spatial denoise at the AO resolution (separable 5 + 5 taps, depth-aware): GTAO rotates its
 		// directions over a 5x5 pattern and jitters its steps per pixel and per frame, which only the
@@ -646,7 +645,6 @@ fn fragment( in: FSIn ) -> vec4f {
 	render() {
 
 		if ( ! this._built ) this.beginFrame();
-		const T = this._timers || null;
 		this.motionBlur.compute( this._outW, this._outH );
 		this._aoDepthPass.render( { colorViews: [ this.aoDepth.texture ], clear: CLR } );
 		this.aoPass.render();
@@ -683,7 +681,6 @@ fn fragment( in: FSIn ) -> vec4f {
 		this._finalPass.render( { colorViews: [ out ], clear: CLR } );
 		// meter this frame's image; the result is used from the next frame on
 		this.meterKernel.dispatch( [ 1, 1, 1 ] );
-		void T;
 
 	}
 
@@ -707,7 +704,7 @@ fn fragment( in: FSIn ) -> vec4f {
 		}
 
 		if ( this.underwater._shaftPass ) list.push( [ 'underwater shafts', this.underwater._shaftPass ] );
-		list.push( [ 'beauty', this._beautyPass ], [ 'TAAU', this.taau._resolve[ 0 ] ], [ 'TAAU ', this.taau._resolve[ 1 ] ] );
+		list.push( [ 'beauty', this._beautyPass ], [ 'TAAU resolve A', this.taau._resolve[ 0 ] ], [ 'TAAU resolve B', this.taau._resolve[ 1 ] ] );
 		this._bloomPasses.forEach( ( [ p ], i ) => list.push( [ 'bloom ' + i, p ] ) );
 		list.push( [ 'final', this._finalPass ], [ 'auto exposure', this.meterKernel ] );
 		if ( this.flare ) list.push( [ 'flare visibility', this.flare.kernel ] );

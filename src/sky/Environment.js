@@ -5,6 +5,7 @@ import { ComputeMips } from '../ocean/ComputeMips.js';
 import { SceneLighting } from '../engine/render/wgsl/lighting.js';
 import { commonModule } from '../engine/render/wgsl/common.js';
 import { Vector3 } from '../engine/math/index.js';
+import { f } from '../util/wgsl.js';
 
 // Renders the sky (atmosphere + clouds, no sun disk) into a cube map and prefilters it for image based
 // lighting (installs the SceneLighting hooks envSpecular / envDiffuse). Refreshed when the sun moves or
@@ -23,13 +24,6 @@ import { Vector3 } from '../engine/math/index.js';
 
 const LEVELS = 6; // prefiltered mips: 128 .. 4 texels, roughness 0, 0.2, .. 1
 const SH_RES = 32; // source mip read for the irradiance (texels per face edge)
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 // cube face texel -> direction (WebGPU / D3D cube conventions; y down in the face)
 const CUBE_DIR = /* wgsl */`

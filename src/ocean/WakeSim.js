@@ -1,6 +1,7 @@
 import { Vector2, Vector3, Vector4, MathUtils, DataUtils } from '../engine/index.js';
 import { GPU, UniformBlock, Texture, StorageBuffer, ShaderModule, ComputeKernel, commonModule } from '../engine/webgpu.js';
 import { GRAVITY } from '../core/Globals.js';
+import { f } from '../util/wgsl.js';
 
 const N = 512; // grid cells per side
 const LOG2N = 9;
@@ -16,13 +17,6 @@ const TW = 32, TH = 88; // 0.1 m texels (steep pressure near the stem: keep resa
 const TX0 = - 1.6, TX1 = 1.6, TZ0 = - 4.4, TZ1 = 4.4;
 
 // WGSL float literal
-const f = ( x ) => {
-
-	const s = String( x );
-	return /[.e]/.test( s ) ? s : s + '.0';
-
-};
-
 // Interactive boat wake: a linear free-surface wave simulation with exact dispersion.
 //
 // Height h and vertical velocity w on a 512^2 grid (0.4 m cells, 205 m) in a window that follows

@@ -5,16 +5,10 @@ import { ShaderModule, UniformBlock } from '../engine/gpu/Shader.js';
 import { LAYERS } from '../engine/render/SceneRenderer.js';
 import { G } from '../engine/render/Frame.js';
 import { Vector2, Vector3 } from '../engine/math/index.js';
+import { f } from '../util/wgsl.js';
 
 const GNAT_SWARMS = 4, GNATS_PER_SWARM = 12, SEEDS = 48;
 const VISIBILITY = 8;
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 // Life in the air around the camera: dust and pollen motes, fine salt aerosol near the surf, a few
 // drifting seed tufts and, rarely, a loose swarm of gnats hovering over the vegetation. Like

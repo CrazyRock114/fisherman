@@ -1,6 +1,7 @@
 import { Vector2, Vector3, MathUtils } from '../engine/index.js';
 import { GPU, ShaderModule, UniformBlock, ComputeKernel, Texture, G, FrameUniforms } from '../engine/webgpu.js';
 import { commonModule } from '../engine/render/wgsl/common.js';
+import { f } from '../util/wgsl.js';
 
 // Volumetric cumulus from sky-pro-webgpu (../sky-pro-webgpu, "Partly cloudy" preset): procedural
 // weather map, baked 64³ Perlin-Worley shape noise with a height-dependent erosion, a cone-traced
@@ -8,20 +9,13 @@ import { commonModule } from '../engine/render/wgsl/common.js';
 // lattice trace reconstructed temporally at half resolution. Lit by Tidewater's atmosphere (sun
 // or moon key light, sky view LUT) instead of sky-pro's own.
 //
-// Same public interface as the previous clouds (sky/Clouds.js):
+// Public interface:
 //   clouds.module:        fn cloudsSampleView( dir ) -> vec4f   ( rgb in-scattered radiance, a transmittance ), main view
 //                         fn cloudsSample( dir ) -> vec4f       panorama (reflections, environment, Snell's window)
 //   clouds.shadowModule:  fn cloudsShadow( worldXZ ) -> f32     cloud shadow on the ground (1 = clear)
 //   clouds.coverage       { value } 0..1
 //   clouds.update( dt, camera ), clouds.resolutionScale, clouds.resetHistory(), clouds.invalidate()
 //   await clouds.ready    (noise volume download)
-
-const f = ( x ) => {
-
-	const s = Number( x ).toString();
-	return /[.eE]/.test( s ) ? s : s + '.0';
-
-};
 
 const DEG = Math.PI / 180;
 
@@ -50,7 +44,7 @@ const PRESET = {
 // sky-pro "high" quality
 const QUALITY = { historyDivisor: 2, lattice: 4, maxSteps: 256, lightTaps: 6, stepMeters: 25, fullLightingAlpha: 0.5, lightReuseSteps: 3, historyWeight: 0.9 };
 
-const PANO_W = 512, PANO_H = 160; // same mapping as sky/Clouds.js (elevation -4..90 deg, v = sqrt)
+const PANO_W = 512, PANO_H = 160; // elevation -4..90 deg, v = sqrt
 const PANO_LATTICE = 4; // 1/16 of the panorama per frame
 const SHADOW_RES = 256;
 const AP_DIST = 30000; // m: aerial perspective toward the horizon
@@ -680,7 +674,8 @@ fn scTileIndex( p: vec2i, origin: vec2i, width: u32 ) -> u32 {
 	return local.y * width + local.x;
 }
 fn scHistoryAt( uv: vec2f, size: vec2f ) -> vec4f {
-	// five tap Catmull-Rom: detail survives repeated history warps
+	// five tap Catmull-Rom: detail survives repeated history warps (twin of TemporalUpscale.taauSampleHistory —
+	// same weight math, different texture/normalization: keep them in sync)
 	let position = uv * size;
 	let center = floor( position - 0.5 ) + 0.5;
 	let fr = position - center;

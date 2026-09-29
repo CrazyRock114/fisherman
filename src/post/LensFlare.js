@@ -3,6 +3,7 @@ import { ComputeKernel } from '../engine/gpu/Compute.js';
 import { StorageBuffer } from '../engine/gpu/Texture.js';
 import { commonModule } from '../engine/render/wgsl/common.js';
 import { MathUtils, Vector2, Vector3 } from '../engine/math/index.js';
+import { f } from '../util/wgsl.js';
 
 // Camera lens flare for the sun (and the moon, dimly), built from what a real multi-element lens
 // does rather than sprites:
@@ -37,13 +38,6 @@ const GHOSTS = [
 	{ a: - 1.15, r: 0.05, tint: [ 1.0, 0.8, 0.55 ], k: 0.28 },
 ];
 const VIS_TAPS = 24;
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 export class LensFlare {
 

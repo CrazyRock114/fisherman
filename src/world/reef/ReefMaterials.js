@@ -5,6 +5,7 @@ import { commonModule } from '../../engine/render/wgsl/common.js';
 import { lodFadeModule } from '../../materials/LODFade.js';
 import { WORLD } from '../WorldLayout.js';
 import { NOISE_SCALE } from './ReefNoise.js';
+import { f } from '../../util/wgsl.js';
 
 // Materials of the reef (WGSL snippets on the engine Material). All surface detail is procedural;
 // the only texture is a small tileable 3D noise volume (ReefNoise.js) that replaces per-pixel
@@ -50,13 +51,6 @@ export const SURFACE = {
 
 const SWELL = new Vector2( WORLD.swellDir.x, WORLD.swellDir.y ).normalize();
 const TAU = Math.PI * 2;
-const f = ( x ) => {
-
-	const s = String( x );
-	return /[.e]/.test( s ) ? s : s + '.0';
-
-};
-
 export const srgb = ( hex ) => {
 
 	const c = new Color( hex );

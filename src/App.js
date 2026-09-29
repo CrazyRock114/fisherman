@@ -14,7 +14,6 @@ import { installDebugViews } from './core/DebugViews.js';
 
 import { Atmosphere, SUN_ILLUMINANCE } from './sky/Atmosphere.js';
 import { Sky, sunDirectionFromTime } from './sky/Sky.js';
-import { Clouds } from './sky/Clouds.js';
 import { SkyProClouds } from './sky/SkyProClouds.js';
 import { Environment } from './sky/Environment.js';
 
@@ -116,8 +115,7 @@ export class App {
 		this.sky = new Sky( this.atmosphere );
 		if ( ! qs.has( 'noClouds' ) ) {
 
-			// sky-pro-webgpu's clouds ("Partly cloudy"); ?oldClouds: the previous ones
-			this.clouds = qs.has( 'oldClouds' ) ? new Clouds( renderer, this.atmosphere ) : new SkyProClouds( renderer, this.atmosphere );
+			this.clouds = new SkyProClouds( renderer, this.atmosphere );
 			if ( this.clouds.ready ) await this.clouds.ready;
 			this.sky.clouds = this.clouds;
 

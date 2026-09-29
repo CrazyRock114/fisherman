@@ -259,7 +259,8 @@ fn taauLockLuma( rgb: vec3f ) -> f32 {
 	return pow( max( p, 0.0 ), 1.0 / 6.0 );
 }
 
-// Catmull-Rom history lookup with 5 bilinear taps (the 4 corner taps are dropped)
+// Catmull-Rom history lookup with 5 bilinear taps (the 4 corner taps are dropped). Twin of
+// SkyProClouds.scHistoryAt — same weight math, different texture/normalization: keep them in sync.
 fn taauSampleHistory( uvIn: vec2f ) -> vec4f {
 	let size = vec2f( textureDimensions( taauHistory ) );
 	let samplePos = uvIn * size;

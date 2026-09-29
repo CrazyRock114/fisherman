@@ -4,6 +4,7 @@ import { Texture, StorageBuffer } from '../engine/gpu/Texture.js';
 import { Readback } from '../engine/gpu/Readback.js';
 import { commonModule } from '../engine/render/wgsl/common.js';
 import { Color, Vector3 } from '../engine/math/index.js';
+import { f } from '../util/wgsl.js';
 
 // Physically based sky (Hillaire 2020, "A Scalable and Production Ready Sky and Atmosphere
 // Rendering Technique"). All distances in km inside the atmosphere code.
@@ -28,13 +29,6 @@ const T_W = 256, T_H = 64;
 const MS_RES = 32;
 const SV_W = 192, SV_H = 108;
 const LOG_STEP = Math.log( 1.02 );
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 function makeLUT( w, h, name ) {
 

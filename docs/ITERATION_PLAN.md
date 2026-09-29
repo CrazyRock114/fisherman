@@ -5,7 +5,9 @@
 
 ---
 
-## P0 债务清理（1-2 天，低风险高回报）
+## P0 债务清理（✅ 已完成 2026-09-30，见 tag v1.1-debt-clear）
+
+> 实际执行记录：删除 Clouds.js（-1621 行死代码）+ `?oldClouds` 开关；fresnel 复用 waterFresnelModule；`f()` 助手从全库 23 份副本合并为 `src/util/wgsl.js` 单点（toPrecision/toFixed 语义变体保留）；级联浅水衰减改为消费 WaterSurface.attenuationModule；PostFX `_timers` 死代码/重复赋值/`'TAAU '` 标签清理；Frame.setFrameCamera 零分配改造（per-block 私有 scratch）。catmullRom 两处为签名不同的孪生实现，按交叉引用注释处理（硬合并有回归风险）。净 -1750 行。验收：无头 ocean-surface/spray 逐像素一致 + 泡沫沉淀数 2701 逐位一致；浏览器 beach 改前/改后差异 0.021% 低于同代码噪声底 0.028%；game-logic 37 项全过。测试适配：sky-env/sky-perf/sky-textures/post-chain 迁移到 SkyProClouds，sky-clouds.mjs 删除，headless.mjs 增加 public/ fetch 垫片。
 
 | # | 任务 | 证据 | 验收 |
 |---|---|---|---|

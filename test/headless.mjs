@@ -1,11 +1,29 @@
 // Headless WebGPU (Dawn via the `webgpu` npm package) for engine tests.
 import { create, globals } from 'webgpu';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 Object.assign( globalThis, globals );
 Object.defineProperty( globalThis, 'navigator', { value: { gpu: create( [] ) }, configurable: true } );
 globalThis.location = { search: '' };
+
+// root-relative fetches (SkyProClouds' noise blobs, …) resolve against the repo's public/ directory
+const _publicDir = join( dirname( fileURLToPath( import.meta.url ) ), '..', 'public' );
+const _origFetch = globalThis.fetch.bind( globalThis );
+globalThis.fetch = ( input, init ) => {
+
+	const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+	if ( url.startsWith( '/' ) ) {
+
+		const file = join( _publicDir, decodeURIComponent( url.split( '?' )[ 0 ] ).replace( /^\/+/, '' ) );
+		return Promise.resolve( new Response( readFileSync( file ), { status: 200 } ) );
+
+	}
+	return _origFetch( input, init );
+
+};
 
 // minimal RGBA8 PNG writer
 export function writePNG( path, width, height, rgba ) {

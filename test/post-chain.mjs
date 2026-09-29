@@ -58,11 +58,11 @@ if ( REAL !== null ) {
 
 	const { Atmosphere, SUN_ILLUMINANCE } = await import( '../src/sky/Atmosphere.js' );
 	const { Sky, sunDirectionFromTime } = await import( '../src/sky/Sky.js' );
-	const { Clouds } = await import( '../src/sky/Clouds.js' );
+	const { SkyProClouds } = await import( '../src/sky/SkyProClouds.js' );
 	H_ = await import( './sky-harness.mjs' );
 	atmosphere = new Atmosphere();
 	sky = new Sky( atmosphere );
-	clouds = new Clouds( null, atmosphere );
+	clouds = new SkyProClouds( null, atmosphere );
 	clouds.outputSize = { x: W, y: H };
 	sky.clouds = clouds;
 	realApp = { atmosphere, sky, clouds };

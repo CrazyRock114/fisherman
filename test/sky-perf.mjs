@@ -3,7 +3,7 @@
 import { GPU, G, E, setFrameCamera, setTimeOfDay, applyReadback, wait } from './sky-harness.mjs';
 import { Atmosphere, SUN_ILLUMINANCE } from '../src/sky/Atmosphere.js';
 import { Sky, sunDirectionFromTime } from '../src/sky/Sky.js';
-import { Clouds } from '../src/sky/Clouds.js';
+import { SkyProClouds } from '../src/sky/SkyProClouds.js';
 import { Environment } from '../src/sky/Environment.js';
 import { MeshRenderer } from '../src/engine/render/MeshRenderer.js';
 import { SceneRenderer } from '../src/engine/render/SceneRenderer.js';
@@ -19,7 +19,7 @@ if ( ! GPU.hasTimestamp ) {
 const W = Number( process.argv[ 2 ] || 2560 ), H = Number( process.argv[ 3 ] || 1267 );
 const atmosphere = new Atmosphere();
 const sky = new Sky( atmosphere );
-const clouds = new Clouds( null, atmosphere );
+const clouds = new SkyProClouds( null, atmosphere );
 clouds.outputSize = { x: W, y: H };
 sky.clouds = clouds;
 const scene = new E.Scene();
@@ -80,7 +80,6 @@ for ( let f = 0; f < FR; f ++ ) {
 	GPU.beginFrame();
 	atmosphere.update( 1 / 60, camera.position.y );
 	clouds.update( 1 / 60, camera );
-	for ( const s of clouds._traceSets ) if ( s ) [ s.trace, s.high, s.box, ...s.resolve ].forEach( wrap );
 	env.update( 1 / 60 );
 	setFrameCamera( camera, W, H );
 	sr.render();

@@ -1,6 +1,7 @@
 import { Vector2 } from '../engine/math/index.js';
 import { Texture, UniformBlock, ShaderModule, commonModule } from '../engine/webgpu.js';
 import { G, GRAVITY } from '../engine/render/Frame.js';
+import { f } from '../util/wgsl.js';
 
 // Depth-aware shoreline waves.
 //
@@ -39,13 +40,6 @@ const BEACH_SLOPE = 0.066; // run-up is converted to a horizontal excursion with
 const SWASH_UP = 0.4, SWASH_DOWN = 0.55; // fractions of the period: uprush, backwash
 const SWASH_OVERSHOOT = 1.2; // the mesh sheet reaches this far (m) past the leading edge (> the mesh spacing,
 // so the per-pixel front, not the triangles, always decides where the sheet ends)
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 // one evaluate() variant: mode 'normal' (the water mesh), 'plain' (withNormal: false), 'world'
 function evaluateCode( name, mode ) {

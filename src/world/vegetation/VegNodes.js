@@ -4,6 +4,7 @@ import { commonModule } from '../../engine/render/wgsl/common.js';
 import { lodFadeModule } from '../../materials/LODFade.js';
 import { getDetailTexture } from '../terrain/DetailTextures.js';
 import { LOBE_TABLE, TREE_VARIANTS, SHRUB_VARIANTS } from './PlantGeometry.js';
+import { f } from '../../util/wgsl.js';
 
 // Shared WGSL building blocks for all vegetation: hashing, value noise, wind and the
 // plant deformation used by palms, young palms, bananas and ferns.
@@ -55,12 +56,7 @@ export const LOD_BAND = 0.12; // share of the switch distance
 export const UNDER_FERN_FADE = [ 42, 58 ];
 
 // WGSL float literal
-export const f = ( x ) => {
 
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 export const vegModule = new ShaderModule( {
 	name: 'veg',

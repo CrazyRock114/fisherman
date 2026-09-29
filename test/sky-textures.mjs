@@ -6,14 +6,14 @@ import { readTexture } from '../src/engine/gpu/Readback.js';
 import { FullscreenPass } from '../src/engine/render/FullscreenPass.js';
 import { Texture } from '../src/engine/gpu/Texture.js';
 import { Atmosphere } from '../src/sky/Atmosphere.js';
-import { Clouds } from '../src/sky/Clouds.js';
+import { SkyProClouds } from '../src/sky/SkyProClouds.js';
 
 await GPU.init( { headless: true } );
 const out = process.argv[ 2 ] || '/tmp';
-const clouds = new Clouds( null, new Atmosphere() );
+const clouds = new SkyProClouds( null, new Atmosphere() );
 GPU.submit();
 
-for ( const [ name, n, is3D ] of [ [ 'weatherTex', 512 ], [ 'synTex', 256 ], [ 'fibTex', 1024 ], [ 'shapeTex', 128, true ], [ 'detailTex', 64, true ] ] ) {
+for ( const [ name, n, is3D ] of [ [ 'weatherMap', clouds.weatherMap.width ], [ 'weatherBounds', clouds.weatherBounds.width ], [ 'blue', clouds.blue.width ], [ 'noise', clouds.noise.width, true ] ] ) {
 
 	const dst = new Texture( { width: n, height: n, format: 'rgba8unorm', usage: [ 'render', 'copySrc', 'sample' ] } );
 	const pass = new FullscreenPass( { label: 'dump', colorFormats: [ 'rgba8unorm' ], bindings: { src: { texture: clouds[ name ] } },

@@ -5,6 +5,7 @@ import { G } from '../engine/render/Frame.js';
 import { shadowModule } from '../engine/render/wgsl/lighting.js';
 import { commonModule } from '../engine/render/wgsl/common.js';
 import { MathUtils, Vector2 } from '../engine/math/index.js';
+import { f } from '../util/wgsl.js';
 
 // full-screen passes overwrite every pixel: clear instead of load (no tile load of the old contents on
 // tile-based GPUs)
@@ -47,13 +48,6 @@ const SS_GAIN = 3.5;
 // haze layers: sea level extinction (1/m) and scale height (m)
 const MARINE = { sigma: 1.5e-4, H: 110 };
 const AEROSOL = { sigma: 3.2e-5, H: 1400 };
-
-const f = ( x ) => {
-
-	const s = String( x );
-	return s.includes( '.' ) || s.includes( 'e' ) ? s : s + '.0';
-
-};
 
 // sunShadowHard until the engine's shadow module has it
 const hardShadowFallback = new ShaderModule( { name: 'haze-shadow-hard', deps: [ shadowModule ], code: /* wgsl */`
