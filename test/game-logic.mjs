@@ -132,6 +132,17 @@ ok( s2.addFish( 'grunt', 0.5 ).id > b.id, 'ids keep counting after a load' );
 	ok( emitted === 1, 'import notifies the listeners (gear reapplies)' );
 
 }
+// ---- localization data: every species and upgrade level carries its Chinese name
+{
+
+	let missing = [];
+	for ( const id of FISH_IDS ) if ( ! FISH[ id ].zh ) missing.push( id );
+	ok( missing.length === 0, `every species has a zh name${ missing.length ? ' (missing: ' + missing.join( ', ' ) + ')' : '' }` );
+	missing = [];
+	for ( const key in UPGRADES ) for ( const lv of UPGRADES[ key ].levels ) if ( ! lv.zhLabel ) missing.push( key + ':' + lv.label );
+	ok( missing.length === 0, `every upgrade level has a zhLabel${ missing.length ? ' (missing: ' + missing.join( ', ' ) + ')' : '' }` );
+
+}
 // ---- lengths and the catch card's record logic
 {
 

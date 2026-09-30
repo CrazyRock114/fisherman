@@ -49,12 +49,15 @@ export class FishStand {
 		const local = new Vector3( 0.2, 0, 0.12 ).applyAxisAngle( new Vector3( 0, 1, 0 ), STAND.yaw );
 		this.vendor = new Vendor( {
 			name: 'Joe · Fish buyer',
+			zh: '乔 · 鱼贩',
 			kind: 'buyer',
 			position: new Vector3( STAND.x + local.x, y + STALL_FLOOR, STAND.z + local.z ),
 			yaw: STAND.yaw,
 			radius: 3.2,
 			greeting: 'Let\'s see what you caught. Fair prices, cash.',
+			zhGreeting: '看看你钓到了什么。价钱公道，现金结算。',
 			idle: 'Nothing to sell? The grunts are biting off the pier.',
+			zhIdle: '没货？码头外的石鲈正咬钩呢。',
 			material: this.material,
 			// realistic character (Rocketbox, MIT): the stand-in shows until it has loaded
 			character: { url: ( ( import.meta.env && import.meta.env.BASE_URL ) || '/' ) + 'models/characters/joe.glb', idle: 'idle_neutral_01', talk: 'gestic_talk_relaxed_01', greet: 'wave_01' },

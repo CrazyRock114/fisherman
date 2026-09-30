@@ -7,6 +7,7 @@ import { GameState } from './GameState.js';
 import { FishingRod } from './FishingRod.js';
 import { FishStand } from './FishStand.js';
 import { Chandlery } from './Chandlery.js';
+import { t, nameOf } from '../ui/lang.js';
 import { CatchDisplay } from './CatchDisplay.js';
 import { UPGRADES, fuelBurn } from './Gear.js';
 import { GameHUD } from './GameHUD.js';
@@ -105,7 +106,7 @@ export class Game {
 	buy( key ) {
 
 		const r = this.state.buy( key );
-		if ( r ) this.toast( `${ UPGRADES[ key ].name }: ${ r.label }` );
+		if ( r ) this.toast( `${ t( UPGRADES[ key ].name, UPGRADES[ key ].zh ) }: ${ t( r.label, r.zhLabel ) }` );
 		return r;
 
 	}
@@ -116,7 +117,7 @@ export class Game {
 		if ( l > 0 ) {
 
 			this._fuelOut = false;
-			this.toast( `Filled up · ${ l.toFixed( 0 ) } L` );
+			this.toast( t( `Filled up · ${ l.toFixed( 0 ) } L`, `已加满 · ${ l.toFixed( 0 ) } 升` ) );
 
 		}
 
@@ -159,7 +160,7 @@ export class Game {
 
 			rod.equip( ! rod.equipped );
 			if ( ! rod.equipped ) this.cancelLine();
-			this.toast( rod.equipped ? 'Rod out · hold left mouse to cast' : 'Rod away', 1600 );
+			this.toast( rod.equipped ? t( 'Rod out · hold left mouse to cast', '已出竿 · 按住左键蓄力，松开抛投' ) : t( 'Rod away', '已收竿' ), 1600 );
 
 		}
 
@@ -290,24 +291,24 @@ export class Game {
 
 			// by the water (boat deck, pier, the wet beach, wading): suggest the rod
 			const byWater = p.mode === 'deck' || ( p.mode === 'walk' && [ 'wood', 'wetsand', 'water' ].includes( p.surface ) );
-			return byWater ? { key: 'R', text: 'Take out the rod' } : null;
+			return byWater ? { key: 'R', text: t( 'Take out the rod', '拿出鱼竿' ) } : null;
 
 		}
 
 		const b = this.bite;
 		switch ( rod.state ) {
 
-			case 'idle': return { key: 'LMB', text: 'Hold to wind up, release to cast   ·   R  put the rod away' };
-			case 'windup': return { key: 'LMB', text: 'Release to cast (hold longer to cast farther)' };
+			case 'idle': return { key: 'LMB', text: t( 'Hold to wind up, release to cast   ·   R  put the rod away', '按住蓄力，松开抛投   ·   R 收竿' ) };
+			case 'windup': return { key: 'LMB', text: t( 'Release to cast (hold longer to cast farther)', '松开抛投（按得越久抛得越远）' ) };
 			case 'flying': return null;
 			case 'floating':
-				if ( b && b.phase === 'take' ) return { key: 'LMB', text: 'Strike now!' };
-				if ( b && b.phase === 'nibble' ) return { key: '…', text: 'Something\'s nibbling · wait until the bobber is pulled under' };
-				return { key: 'RMB', text: 'Waiting for a bite · right-click to reel the line in' };
-			case 'retrieving': return { key: 'RMB', text: 'Reeling in' };
+				if ( b && b.phase === 'take' ) return { key: 'LMB', text: t( 'Strike now!', '快刺鱼！' ) };
+				if ( b && b.phase === 'nibble' ) return { key: '…', text: t( 'Something\'s nibbling · wait until the bobber is pulled under', '有鱼在试探 · 等浮标被拉进水里' ) };
+				return { key: 'RMB', text: t( 'Waiting for a bite · right-click to reel the line in', '等鱼咬钩 · 右键收线' ) };
+			case 'retrieving': return { key: 'RMB', text: t( 'Reeling in', '收线中' ) };
 			case 'fighting': return this.fight && this.fight.tension > this.fight.band[ 1 ]
-				? { key: 'LMB', text: 'Too much tension · let go!' }
-				: { key: 'LMB', text: 'Hold to reel · let go when the tension goes red' };
+				? { key: 'LMB', text: t( 'Too much tension · let go!', '张力过大 · 快松手！' ) }
+				: { key: 'LMB', text: t( 'Hold to reel · let go when the tension goes red', '按住收线 · 张力变红就松手' ) };
 			case 'landing': return null;
 			default: return null;
 
@@ -325,7 +326,7 @@ export class Game {
 			if ( left <= 0 ) {
 
 				b.throttle = 0;
-				if ( ! this._fuelOut ) this.toast( 'Out of fuel · buy diesel at the chandlery by the boathouse', 4000 );
+				if ( ! this._fuelOut ) this.toast( t( 'Out of fuel · buy diesel at the chandlery by the boathouse', '燃油耗尽 · 去船屋旁的杂货店买柴油' ), 4000 );
 				this._fuelOut = true;
 
 			}
@@ -360,7 +361,7 @@ export class Game {
 		for ( const v of this.vendors ) v.talking = !! ( hud && hud.standOpen && hud.vendor === v );
 		if ( hud && hud.standOpen && ( ! near || near !== hud.vendor ) ) hud.closeStand();
 		if ( ! near || this.fight || this._cardDismissed || ( hud && hud.catchOpen ) ) return;
-		if ( ! p.prompt ) p.prompt = { key: 'E', text: hud && hud.standOpen ? 'Leave' : `Talk to ${ near.name.split( ' ·' )[ 0 ] }` };
+		if ( ! p.prompt ) p.prompt = { key: 'E', text: hud && hud.standOpen ? t( 'Leave', '离开' ) : t( `Talk to ${ near.name.split( ' ·' )[ 0 ] }`, `和 ${ ( near.zh || near.name ).split( ' ·' )[ 0 ] } 聊聊` ) };
 		if ( inp.hit( 'KeyE' ) ) {
 
 			if ( ! hud ) {
@@ -377,7 +378,7 @@ export class Game {
 	sellAll() {
 
 		const r = this.state.sell();
-		if ( r.count ) this.toast( `Sold ${ r.count } fish for $${ r.total }` );
+		if ( r.count ) this.toast( t( `Sold ${ r.count } fish for $${ r.total }`, `卖出 ${ r.count } 条鱼，共 $${ r.total }` ) );
 		if ( this.app.audio && this.app.audio.coin ) this.app.audio.coin();
 		return r;
 
@@ -386,7 +387,7 @@ export class Game {
 	sell( ids ) {
 
 		const r = this.state.sell( ids );
-		if ( r.count ) this.toast( `Sold for $${ r.total }` );
+		if ( r.count ) this.toast( t( `Sold for $${ r.total }`, `卖出，共 $${ r.total }` ) );
 		return r;
 
 	}
@@ -421,7 +422,7 @@ export class Game {
 
 		if ( where !== 'water' ) {
 
-			this.toast( 'Landed on the sand', 1400 );
+			this.toast( t( 'Landed on the sand', '鱼落在了沙滩上' ), 1400 );
 			return;
 
 		}
@@ -477,7 +478,7 @@ export class Game {
 
 		} else if ( b.phase === 'take' ) {
 
-			this.toast( 'It took the bait and ran', 1800 );
+			this.toast( t( 'It took the bait and ran', '它咬了饵跑掉了' ), 1800 );
 			this.bite = { phase: 'wait', t: biteDelay( this.habitat(), this.hour ) };
 
 		}
@@ -490,7 +491,7 @@ export class Game {
 		if ( ! b || b.phase === 'wait' || b.phase === 'nibble' ) {
 
 			// too early: a nibbling fish isn't hooked yet; it keeps nibbling (a hint, no penalty)
-			if ( b && b.phase === 'nibble' ) this.toast( 'Not yet · wait for it to pull under', 1500 );
+			if ( b && b.phase === 'nibble' ) this.toast( t( 'Not yet · wait for it to pull under', '还不到时候 · 等它把浮标拉下去' ), 1500 );
 			return;
 
 		}
@@ -499,7 +500,7 @@ export class Game {
 		this.fight = new CatchMinigame( { species: b.species, kg: b.kg, lineKg: g.lineKg, reelSpeed: g.reelSpeed, distance: Math.max( 3, this.rod.lineOut ) } );
 		this.bite = null;
 		this.rod.hook();
-		this.toast( 'Fish on!', 1200 );
+		this.toast( t( 'Fish on!', '上钩了！' ), 1200 );
 
 	}
 

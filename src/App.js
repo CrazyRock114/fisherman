@@ -2,6 +2,7 @@ import { Vector3, Euler, Color, MathUtils, Mesh } from './engine/index.js';
 import { GPU } from './engine/gpu/GPU.js';
 import { SunShadows } from './engine/render/Shadows.js';
 import { FrameUniforms } from './engine/render/Frame.js';
+import { t } from './ui/lang.js';
 
 import { Engine } from './core/Engine.js';
 import { Input } from './core/Input.js';
@@ -92,7 +93,7 @@ export class App {
 			if ( typeof requestAnimationFrame === 'function' ) await new Promise( ( r ) => requestAnimationFrame( () => setTimeout( r, 0 ) ) );
 
 		};
-		await progress( 0.02, 'Starting WebGPU…' );
+		await progress( 0.02, t( 'Starting WebGPU…', '正在启动 WebGPU…' ) );
 		const engine = this.engine = new Engine( document.getElementById( 'app' ) );
 		await engine.init();
 		// systems take `renderer` first as in the three.js version: it is the Engine now (GPU access is global)
@@ -110,7 +111,7 @@ export class App {
 		this.fly.setPose( new Vector3( 20, 6, - 20 ), Math.PI * 0.9, - 0.12 );
 
 		// ---------------------------------------------------------------- sky
-		await progress( 0.04, 'Building the atmosphere…' );
+		await progress( 0.04, t( 'Building the atmosphere…', '正在构建大气…' ) );
 		this.atmosphere = new Atmosphere( renderer );
 		this.sky = new Sky( this.atmosphere );
 		if ( ! qs.has( 'noClouds' ) ) {
@@ -131,22 +132,22 @@ export class App {
 		this.environment = new Environment( renderer, scene, this.sky );
 
 		// ---------------------------------------------------------------- island
-		await progress( 0.06, 'Shaping the island…' );
+		await progress( 0.06, t( 'Shaping the island…', '正在塑造海岛…' ) );
 		this.terrainData = new TerrainData();
 		this.colliders = new Colliders();
 		// the village flattens building pads into the heightmap: build it before any terrain
 		// data is derived (shore field, GPU textures, meshes)
-		await progress( 0.12, 'Building the village…' );
+		await progress( 0.12, t( 'Building the village…', '正在建造村庄…' ) );
 		this.village = new Village( { scene, terrain: this.terrainData, colliders: this.colliders } );
 		if ( ! qs.has( 'noVeg' ) ) {
 
-			await progress( 0.14, 'Planting the island…' );
+			await progress( 0.14, t( 'Planting the island…', '正在种上植被…' ) );
 			this.vegetation = new Vegetation( { scene, terrain: this.terrainData, village: this.village } );
 			useStaticVelocity( this.vegetation.group );
 
 		}
 
-		await progress( 0.19, 'Rolling in the swell…' );
+		await progress( 0.19, t( 'Rolling in the swell…', '正在涌起涌浪…' ) );
 		this.shoreField = computeShoreField( this.terrainData, { res: 512, swellDir: [ WORLD.swellDir.x, WORLD.swellDir.y ] } );
 		this.terrainGPU = new TerrainGPU( this.terrainData, this.shoreField );
 		// terrain and rocks apply the heightfield sun shadow (long hill shadows) in their own lighting
@@ -158,7 +159,7 @@ export class App {
 		this.terrain.mesh.material.appliesHillShadow = true;
 		this.rocks.material.appliesHillShadow = true;
 
-		await progress( 0.23, 'Growing the reef…' );
+		await progress( 0.23, t( 'Growing the reef…', '正在生长珊瑚礁…' ) );
 		this.reef = new Reef( { scene, terrain: this.terrainData, shoreField: this.shoreField } );
 
 		this.boat = new BoatModel();
@@ -167,7 +168,7 @@ export class App {
 		this.boat.group.rotation.y = WORLD.boatDock.heading;
 
 		// ---------------------------------------------------------------- ocean
-		await progress( 0.3, 'Simulating the ocean…' );
+		await progress( 0.3, t( 'Simulating the ocean…', '正在模拟海洋…' ) );
 		this.fft = new OceanFFT( renderer );
 		if ( this.reef.setOcean ) this.reef.setOcean( this.fft ); // coral / sea fan sway follows the simulated swell
 		this.foamTexture = createFoamTexture( renderer );
@@ -316,7 +317,7 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		this.freeCam = qs.has( 'fly' );
 
 		// ---------------------------------------------------------------- post
-		await progress( 0.34, 'Preparing the shaders…' );
+		await progress( 0.34, t( 'Preparing the shaders…', '正在准备着色器…' ) );
 		this.underwater = new Underwater( {
 			depthTexture: this.sceneRenderer.sceneRT.depthTexture, maskTexture: this.sceneRenderer.waterMaskTexture,
 			query: this.query, caustics: this.caustics, fft: this.fft,
@@ -375,9 +376,9 @@ fn terrainWetness( xz: vec2f, h: f32 ) -> vec2f {
 		// single warm frame requests them), which lets the game start much earlier; the full
 		// every-mesh precompile then runs behind the start overlay (start()).
 		// stage weights: in the browser the pipeline compile below takes far longer than everything before it
-		await progress( 0.36, 'Compiling shaders…', 0.95 );
+		await progress( 0.36, t( 'Compiling shaders…', '正在编译着色器…' ), 0.95 );
 		await this.precompile( false );
-		await progress( 0.96, 'Warming up…' );
+		await progress( 0.96, t( 'Warming up…', '正在预热…' ) );
 		for ( let i = 0; i < 2; i ++ ) {
 
 			this.frame( 1 / 60 );

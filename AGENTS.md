@@ -52,6 +52,7 @@ git push
 4. 跨系统共享的 WGSL 函数走 ShaderModule 单点定义（前缀表见 PORTING.md），禁止复制粘贴两份。
 5. 改时序/滤波算法前先跑基线：`?bench&shots=<view>` 出参考图对比，测试基建见 `test/taa-pier.mjs`。
 6. 随机性一律用可注入 rng（`Bites.js` 风格），保证测试确定性。
+7. 用户可见字符串一律 `t( 'English', '中文' )`（`src/ui/lang.js`）；鱼种/装备名用数据表 `zh`/`zhLabel` 字段 + `nameOf()`。语言由 `?lang=zh`、localStorage（`tidewater-lang`）或浏览器语言决定，切换即刷新。
 
 ## 对象扩展字段契约（跨文件的隐式协议，改动前先查这张表）
 

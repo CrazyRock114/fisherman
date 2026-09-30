@@ -1,4 +1,5 @@
 import { icon, brandMark } from './icons.js';
+import { t } from './lang.js';
 
 // Tidewater UI: settings panel (tabs → folders → controls), HUD, help,
 // photo mode, start overlay and loader. Plain DOM, no dependencies.
@@ -2131,44 +2132,44 @@ export class UI {
 			<div class="tw-help-card tw-glass">
 				<header class="tw-help-head">
 					<div>
-						<h2 id="tw-help-title">Controls</h2>
-						<p>Click the view to capture the mouse. Esc releases it.</p>
+						<h2 id="tw-help-title">${ t( 'Controls', '操作' ) }</h2>
+						<p>${ t( 'Click the view to capture the mouse. Esc releases it.', '点击画面捕捉鼠标，Esc 释放。' ) }</p>
 					</div>
 					<button type="button" class="tw-icon-btn tw-help-close" aria-label="Close" data-tip="Close (F1)">${ icon( 'close' ) }</button>
 				</header>
 				<div class="tw-help-grid">
 					<section>
-						<h3>Move</h3>
-						${ row( wasd, 'Move' ) }
-						${ row( mouse, 'Look around<small>Click to capture</small>' ) }
-						${ row( k( 'Shift' ), 'Sprint, boat boost' ) }
-						${ row( k( 'Space' ), 'Jump, swim up' ) }
-						${ row( k( 'C' ), 'Crouch, dive' ) }
+						<h3>${ t( 'Move', '移动' ) }</h3>
+						${ row( wasd, t( 'Move', '移动' ) ) }
+						${ row( mouse, t( 'Look around<small>Click to capture</small>', '环顾四周<small>点击捕捉鼠标</small>' ) ) }
+						${ row( k( 'Shift' ), t( 'Sprint, boat boost', '奔跑、开船加速' ) ) }
+						${ row( k( 'Space' ), t( 'Jump, swim up', '跳跃、上浮' ) ) }
+						${ row( k( 'C' ), t( 'Crouch, dive', '下蹲、下潜' ) ) }
 					</section>
 					<section>
-						<h3>Interact</h3>
-						${ row( k( 'E' ), 'Interact<small>Board, helm, step ashore, trade</small>' ) }
-						${ row( k( 'V' ), 'Boat camera<small>1st / 3rd person</small>' ) }
-						${ row( k( 'R' ), 'Fishing rod<small>Take out / put away</small>' ) }
-						${ row( k( 'LMB' ), 'Cast, strike, reel<small>Hold to wind up / reel</small>' ) }
-						${ row( k( 'RMB' ), 'Reel in an empty line' ) }
-						${ row( k( 'I' ), 'Cooler and fish log' ) }
-						${ row( k( 'F' ), 'Free camera' ) }
-						${ row( k( 'T' ), 'Pause time' ) }
-						${ row( k( 'L' ), 'Flashlight' ) }
-						${ row( k( 'M' ), 'Mute' ) }
+						<h3>${ t( 'Interact', '互动' ) }</h3>
+						${ row( k( 'E' ), t( 'Interact<small>Board, helm, step ashore, trade</small>', '互动<small>登船、掌舵、上岸、交易</small>' ) ) }
+						${ row( k( 'V' ), t( 'Boat camera<small>1st / 3rd person</small>', '船上视角<small>第一 / 第三人称</small>' ) ) }
+						${ row( k( 'R' ), t( 'Fishing rod<small>Take out / put away</small>', '鱼竿<small>拿出 / 收起</small>' ) ) }
+						${ row( k( 'LMB' ), t( 'Cast, strike, reel<small>Hold to wind up / reel</small>', '抛投、刺鱼、收线<small>按住蓄力 / 收线</small>' ) ) }
+						${ row( k( 'RMB' ), t( 'Reel in an empty line', '收回空线' ) ) }
+						${ row( k( 'I' ), t( 'Cooler and fish log', '鱼箱和鱼类图鉴' ) ) }
+						${ row( k( 'F' ), t( 'Free camera', '自由视角' ) ) }
+						${ row( k( 'T' ), t( 'Pause time', '暂停时间' ) ) }
+						${ row( k( 'L' ), t( 'Flashlight', '手电筒' ) ) }
+						${ row( k( 'M' ), t( 'Mute', '静音' ) ) }
 					</section>
 					<section>
-						<h3>Interface</h3>
-						${ row( k( 'H' ), 'Settings panel' ) }
-						${ row( k( 'P' ), 'Photo mode<small>Hides all interface</small>' ) }
-						${ row( k( 'F1' ) + k( '?' ), 'This sheet' ) }
-						${ row( k( 'Esc' ), 'Release the mouse' ) }
+						<h3>${ t( 'Interface', '界面' ) }</h3>
+						${ row( k( 'H' ), t( 'Settings panel', '设置面板' ) ) }
+						${ row( k( 'P' ), t( 'Photo mode<small>Hides all interface</small>', '拍照模式<small>隐藏全部界面</small>' ) ) }
+						${ row( k( 'F1' ) + k( '?' ), t( 'This sheet', '本说明' ) ) }
+						${ row( k( 'Esc' ), t( 'Release the mouse', '释放鼠标' ) ) }
 					</section>
 				</div>
 				<div class="tw-help-guide">
-					<span><b>How to play:</b> catch fish, sell them to Joe at the fish stand by the pier, and buy upgrades from Marta at the chandlery by the boathouse. Both are on the map (lower right).</span>
-					<button type="button" class="gm-btn is-ghost tw-help-replay">Replay the guide</button>
+					<span><b>${ t( 'How to play:', '玩法：' ) }</b> ${ t( 'catch fish, sell them to Joe at the fish stand by the pier, and buy upgrades from Marta at the chandlery by the boathouse. Both are on the map (lower right).', '钓鱼，把渔获卖给码头旁鱼摊的乔，再去船屋旁杂货店的玛尔塔处买升级。两人都标在地图上（右下角）。' ) }</span>
+					<button type="button" class="gm-btn is-ghost tw-help-replay">${ t( 'Replay the guide', '重看向导' ) }</button>
 				</div>
 			</div>`;
 		el.querySelector( '.tw-help-close' ).addEventListener( 'click', () => this.toggleHelp( false ) );
@@ -2189,13 +2190,13 @@ export class UI {
 			<div class="tw-start-inner">
 				${ brandMark( 'tw-start-mark' ) }
 				<div class="tw-start-title">TIDEWATER</div>
-				<button type="button" class="tw-start-cta"><span class="tw-start-pulse" aria-hidden="true"></span>${ icon( 'mouse' ) }<span>Click to explore</span></button>
+				<button type="button" class="tw-start-cta"><span class="tw-start-pulse" aria-hidden="true"></span>${ icon( 'mouse' ) }<span>${ t( 'Click to explore', '点击进入' ) }</span></button>
 				<div class="tw-start-keys">
-					<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>Move</span>
-					<span><kbd class="tw-kbd-ico">${ icon( 'mouse' ) }</kbd>Look</span>
-					<span><kbd>E</kbd>Interact</span>
-					<span><kbd>H</kbd>Settings</span>
-					<span><kbd>F1</kbd>All controls</span>
+					<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>${ t( 'Move', '移动' ) }</span>
+					<span><kbd class="tw-kbd-ico">${ icon( 'mouse' ) }</kbd>${ t( 'Look', '视角' ) }</span>
+					<span><kbd>E</kbd>${ t( 'Interact', '互动' ) }</span>
+					<span><kbd>H</kbd>${ t( 'Settings', '设置' ) }</span>
+					<span><kbd>F1</kbd>${ t( 'All controls', '全部操作' ) }</span>
 				</div>
 			</div>`;
 		this.root.append( el );
@@ -3322,7 +3323,7 @@ export class UI {
 		const L = document.getElementById( 'loader' );
 		if ( ! L ) return Promise.resolve();
 		if ( this._loaderGone ) return this._loaderGone;
-		this.setLoading( 1, 'Ready' );
+		this.setLoading( 1, t( 'Ready', '就绪' ) );
 		L.classList.remove( 'is-compiling' );
 		L.classList.add( 'tw-hidden' );
 		this._loaderGone = new Promise( ( resolve ) => setTimeout( () => {
