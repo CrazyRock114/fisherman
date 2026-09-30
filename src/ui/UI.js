@@ -1,7 +1,7 @@
 import { icon, brandMark } from './icons.js';
 import { t } from './lang.js';
 
-// Tidewater UI: settings panel (tabs → folders → controls), HUD, help,
+// Fisherman UI: settings panel (tabs → folders → controls), HUD, help,
 // photo mode, start overlay and loader. Plain DOM, no dependencies.
 // All styling lives in ui.css (class prefix `tw-`).
 
@@ -1939,7 +1939,7 @@ export class UI {
 		this.sparkEl = stats.querySelector( '.tw-spark' );
 
 		const brand = h( 'div', 'tw-brand' );
-		brand.innerHTML = `${ brandMark() }<span class="tw-brand-name">TIDEWATER</span>`;
+		brand.innerHTML = `${ brandMark() }<span class="tw-brand-name">FISHERMAN</span>`;
 		this.modeEl = h( 'div', 'tw-mode is-empty', { role: 'status' } );
 		this.modeIco = h( 'span', 'tw-mode-ico' );
 		this.modeText = h( 'span', 'tw-mode-text' );
@@ -1975,7 +1975,7 @@ export class UI {
 
 		// the one element that survives photo mode
 		this.photoHint = h( 'div', 'tw-photo-hint' );
-		this.photoHint.innerHTML = '<kbd>P</kbd><span>Exit photo mode</span>';
+		this.photoHint.innerHTML = `<kbd>P</kbd><span>${ t( 'Exit photo mode', '退出拍照模式' ) }</span>`;
 
 		this.root.append( hud, this.photoHint );
 
@@ -2077,9 +2077,9 @@ export class UI {
 
 		};
 
-		action( 'viewfinder', 'Photo mode (P)', () => this.setPhotoMode( true ) );
-		action( 'help', 'Controls (F1)', () => this.toggleHelp() );
-		action( 'chevrons-right', 'Collapse (H)', () => this.togglePanel( false ) );
+		action( 'viewfinder', t( 'Photo mode (P)', '拍照模式 (P)' ), () => this.setPhotoMode( true ) );
+		action( 'help', t( 'Controls (F1)', '操作说明 (F1)' ), () => this.toggleHelp() );
+		action( 'chevrons-right', t( 'Collapse (H)', '收起 (H)' ), () => this.togglePanel( false ) );
 		head.append( actions );
 
 		this.tabBar = h( 'div', 'tw-tabs', { role: 'tablist', 'aria-label': 'Settings sections' } );
@@ -2104,7 +2104,7 @@ export class UI {
 		this.pages = h( 'div', 'tw-pages' );
 
 		const foot = h( 'footer', 'tw-panel-foot' );
-		foot.innerHTML = '<span><kbd>H</kbd>Hide</span><span><kbd>F1</kbd>Controls</span><span><kbd>P</kbd>Photo mode</span>';
+		foot.innerHTML = `<span><kbd>H</kbd>${ t( 'Hide', '隐藏' ) }</span><span><kbd>F1</kbd>${ t( 'Controls', '操作' ) }</span><span><kbd>P</kbd>${ t( 'Photo mode', '拍照模式' ) }</span>`;
 		panel.append( head, this.tabBar, this.pages, foot );
 
 		// collapsed state: a slim rail of tab icons
@@ -2135,7 +2135,7 @@ export class UI {
 						<h2 id="tw-help-title">${ t( 'Controls', '操作' ) }</h2>
 						<p>${ t( 'Click the view to capture the mouse. Esc releases it.', '点击画面捕捉鼠标，Esc 释放。' ) }</p>
 					</div>
-					<button type="button" class="tw-icon-btn tw-help-close" aria-label="Close" data-tip="Close (F1)">${ icon( 'close' ) }</button>
+					<button type="button" class="tw-icon-btn tw-help-close" aria-label="${ t( 'Close', '关闭' ) }" data-tip="${ t( 'Close (F1)', '关闭 (F1)' ) }">${ icon( 'close' ) }</button>
 				</header>
 				<div class="tw-help-grid">
 					<section>
@@ -2189,7 +2189,7 @@ export class UI {
 		el.innerHTML = `
 			<div class="tw-start-inner">
 				${ brandMark( 'tw-start-mark' ) }
-				<div class="tw-start-title">TIDEWATER</div>
+				<div class="tw-start-title">FISHERMAN</div>
 				<button type="button" class="tw-start-cta"><span class="tw-start-pulse" aria-hidden="true"></span>${ icon( 'mouse' ) }<span>${ t( 'Click to explore', '点击进入' ) }</span></button>
 				<div class="tw-start-keys">
 					<span><span class="tw-wasd"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span>${ t( 'Move', '移动' ) }</span>

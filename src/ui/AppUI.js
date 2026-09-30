@@ -4,7 +4,7 @@ import { G } from '../core/Globals.js';
 import { GroundBounce } from '../materials/GroundBounce.js';
 import { t, setLang, LANG } from './lang.js';
 
-// Binds the Tidewater UI (panel + HUD) to the running app.
+// Binds the Fisherman UI (panel + HUD) to the running app.
 const SEA = {
 	Calm: { wind: 3.5, fetch: 40, chop: 0.75, swell: 0.28, surf: 0.18, period: 11, whitecaps: 0.2 },
 	Breezy: { wind: 7, fetch: 120, chop: 0.9, swell: 0.48, surf: 0.34, period: 9, whitecaps: 0.5 },
@@ -317,7 +317,7 @@ export class AppUI {
 
 				const json = window.prompt( t( 'Paste the save to import:', '粘贴要导入的存档：' ) );
 				if ( ! json ) return;
-				ui.toast( state.importSave( json ) ? t( 'Save imported', '存档已导入' ) : t( 'That does not look like a Tidewater save', '这看起来不是 Tidewater 的存档' ) );
+				ui.toast( state.importSave( json ) ? t( 'Save imported', '存档已导入' ) : t( 'That does not look like a Fisherman save', '这看起来不是 Fisherman 的存档' ) );
 
 			} } );
 

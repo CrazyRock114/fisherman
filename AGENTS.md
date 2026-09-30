@@ -1,6 +1,8 @@
-# AGENTS.md — Tidewater 工作区指南
+# AGENTS.md — Fisherman 工作区指南
 
-面向在本工作区工作的 AI 编码代理与人类协作者。上游：https://github.com/dgreenheck/tidewater（MIT）。
+面向在本工作区工作的 AI 编码代理与人类协作者。上游：https://github.com/dgreenheck/tidewater（MIT，原项目名 Tidewater，本 fork 更名 **Fisherman**）。
+
+**品牌**：用户可见处一律 Fisherman / FISHERMAN（index.html、开始层、面板 brand、向导、toast）。**localStorage 键保留 `tidewater-*` 历史名**（`tidewater.save.v1` / `-lang` / `-quality` / `.guide` / `.ui.tab`）——改名会使玩家存档丢失，键名用户不可见，不值得迁移风险。上游署名保留在 README 顶部与 CREDITS.md（MIT 义务）。
 
 ## 常用命令
 

@@ -68,7 +68,7 @@ const row = ( keys, text ) => `<div class="gm-guide-row"><span class="k">${ keys
 
 const CARDS = [
 	{
-		eyebrow: () => t( 'Welcome to Tidewater', '欢迎来到 TIDEWATER' ),
+		eyebrow: () => t( 'Welcome to Fisherman', '欢迎来到 FISHERMAN' ),
 		title: () => t( 'Fish the island, sell your catch', '钓遍海岛，卖掉渔获' ),
 		body: () => `<p>${ t( 'Catch fish from the <b>beach</b>, the <b>pier</b> or your <b>boat</b>. Different fish bite in the shallows, around the pier, over the reef and out in deep water, and they change with the time of day.',
 			'在<b>沙滩</b>、<b>码头</b>或自己的<b>船上</b>钓鱼。浅滩、码头、礁盘和深水各有不同的鱼，咬钩的鱼种还随昼夜变化。</p><p>' ) }

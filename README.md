@@ -1,11 +1,16 @@
-# Tidewater
+# Fisherman
+
+> **A fork of [Tidewater](https://github.com/dgreenheck/tidewater)** by dgreenheck (MIT), renamed and
+> extended: Chinese localization, quality presets, portable saves, a two-phase shader precompile and
+> the P0/P1 cleanup in `docs/ITERATION_PLAN.md`. All credit for the engine, the ocean, the sky and the
+> game belong to the original author; see [CREDITS.md](CREDITS.md).
 
 An island fishing game for the browser. Cast from the pier, the beach or your own boat, fight the fish,
 sell your catch to Joe at the fish stand, and spend it on better gear at Marta's chandlery. Around it is a
 real-time tropical island and ocean: swim the reef, drive the boat out to deep water, and watch a humpback
 breach. It runs directly on WebGPU and WGSL with its own small rendering engine, no framework.
 
-**Play it:** https://dgreenheck.github.io/tidewater/
+**Play it:** https://fish.ad58.com · **Upstream:** https://dgreenheck.github.io/tidewater/
 
 ![Fishing off the pier at golden hour](docs/screenshot.jpg)
 
